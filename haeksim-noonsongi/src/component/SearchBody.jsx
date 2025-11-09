@@ -9,7 +9,7 @@ export default function SearchBody() {
     <div>
       <div className={styles.questionContainer}>
         <div className={styles.question}>
-          <p>{payload}</p>
+          <p>{prompt}</p>
         </div>
       </div>
     </div>
