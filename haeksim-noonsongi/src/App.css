@@ -1,3 +1,8 @@
+:root {
+  --grey: rgb(237, 237, 237);
+}
 .App {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
