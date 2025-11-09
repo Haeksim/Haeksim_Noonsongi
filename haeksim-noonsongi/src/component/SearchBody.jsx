@@ -1,5 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import PayloadContext from "../context/PayloadContext";
+import styles from "./SearchBody.module.css";
 
 export default function SearchBody() {
-  return <div></div>;
+  const { prompt, setPrompt, payload, setPayload } = useContext(PayloadContext);
+  return (
+    <div>
+      <div className={styles.questionContainer}>
+        <div className={styles.question}>
+          <p>{payload}</p>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -4,22 +4,27 @@ import add from "../icon/add.png";
 import PayloadContext from "../context/PayloadContext";
 
 export default function Input() {
-  /*const [prompt, setPrompt] = useState("");
-  const [payload, setPayload] = useState();*/
+  const [input, setInput] = useState("");
   const { prompt, setPrompt, payload, setPayload } = useContext(PayloadContext);
   const textareaRef = useRef(null);
 
   //인풋 상자 크기 조정 로직
   const handleInputBox = () => {
     const textarea = textareaRef.current;
-    textarea.style.height = "auto"; // reset height
-    const maxHeight = 200; // max height in px
+    textarea.style.height = "auto";
+    const maxHeight = 200;
+
+    if (textarea.value === "") {
+      textarea.style.height = textarea + "px";
+      return;
+    }
+
     textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
   };
 
   //text 입력 로직
   const handleInput = (e) => {
-    setPrompt(e.target.value);
+    setInput(e.target.value);
   };
 
   //pdf 파일 입력 로직
@@ -39,7 +44,7 @@ export default function Input() {
 
   useEffect(() => {
     handleInputBox();
-  }, []);
+  }, [prompt]);
   return (
     <div className={styles.inputContainer}>
       <div className={styles.input}>
@@ -47,13 +52,15 @@ export default function Input() {
           rows={1}
           ref={textareaRef}
           placeholder="정리할 것을 입력해보세요"
-          value={prompt}
+          value={input}
           onChange={handleInput}
           onInput={handleInputBox}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
+              setPrompt(input);
               setPayload(e.target.value);
+              setInput("");
             }
           }}
           className={styles.textarea}
