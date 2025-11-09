@@ -1,0 +1,15 @@
+import React, { useContext } from "react";
+import styles from "./Body.module.css";
+
+import PayloadContext from "../context/PayloadContext";
+import StartBody from "./StartBody";
+import SearchBody from "./SearchBody";
+
+export default function Body() {
+  const { prompt, setPrompt, payload, setPayload } = useContext(PayloadContext);
+  return (
+    <div className={styles.body}>
+      {payload ? <SearchBody /> : <StartBody />}
+    </div>
+  );
+}

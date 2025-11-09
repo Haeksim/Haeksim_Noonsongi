@@ -1,0 +1,7 @@
+.title {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border: 0.1px solid var(--grey);
+  padding: 0.1rem 1rem;
+}

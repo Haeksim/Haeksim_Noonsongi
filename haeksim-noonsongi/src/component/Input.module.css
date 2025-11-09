@@ -1,0 +1,50 @@
+.inputContainer {
+  width: 100%;
+  height: fit-content;
+  padding: 0.5rem 2rem;
+  box-sizing: border-box;
+}
+.input {
+  width: 100%;
+  background-color: white;
+  border-radius: 30px;
+  padding: 0.5rem 2rem;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  border: 0.1px solid var(--grey);
+  align-items: center;
+  box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.09);
+  -webkit-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.09);
+  -moz-box-shadow: 5px 5px 5px 0px rgba(0, 0, 0, 0.09);
+}
+.textarea {
+  width: 95%;
+  resize: none;
+  overflow-y: auto;
+  min-height: 1.5rem;
+  max-height: 200px;
+  line-height: 1.5rem;
+  padding: 0.5rem 0;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+}
+.textarea::placeholder {
+  line-height: 1.5rem;
+}
+.textarea:focus {
+  border: none;
+  outline: none;
+}
+.warning {
+  font-size: 9px;
+  text-align: center;
+}
+.attAddBtn {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.attAddBtn:hover {
+  cursor: pointer;
+}
