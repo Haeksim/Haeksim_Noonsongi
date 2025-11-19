@@ -1,0 +1,9 @@
+models/checkpoints/*
+models/loras/*
+models/vae/*
+models/controlnet/*
+output/*
+.git
+__pycache__
+*.safetensors
+*.pth

@@ -4,7 +4,11 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     git \
+    wget \
     && rm -rf /var/lib/apt/lists/*
+
+# PyTorch를 CPU 전용 버전으로 설치
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 
 # ComfyUI 공식 레포지토리 클론
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git
