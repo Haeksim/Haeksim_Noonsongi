@@ -103,8 +103,10 @@ def generate_lyrics_tool(topic_or_filepath: str, style: str="kpop") -> str:
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a professional lyricist. All responses must be in Korean."),
-        ("user", "'{topic_content}'라는 주제로 노래 가사를 생성해주세요. "
-                 "가사의 시작은 [Verse 1], [Outro] 와 같은 방식으로 생성되도록 해주세요. "
+        ("user", "'{topic_content}'라는 주제로 1분 이내 길이의 노래 가사를 생성해주세요. "
+                 "가사 구조는 반드시 [Verse 1], [Chorus], [Outro] 이 세 파트로만 구성되어야 합니다. "
+                 "다른 파트는 절대 추가하지 마세요. "
+                 "**결과물 맨 위에 노래 제목이나 '##' 같은 헤더를 절대 포함하지 마세요. 바로 [Verse 1]으로 시작하세요.** "
                  "**와 같은 bold체는 제외해주세요. {style}")
     ])
     output_parser = StrOutputParser() | clean_lyrics_output
@@ -121,12 +123,16 @@ def generate_lyrics_tool(topic_or_filepath: str, style: str="kpop") -> str:
         print(cleaned_lyrics)
         print("---------------------")
 
-        output_filename = "lyrics.txt"
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(current_dir)
+        files_dir = os.path.join(project_root, "files")
+        os.makedirs(files_dir, exist_ok=True)
+        output_filename = os.path.join(files_dir, "lyrics.txt")
+        
         with open(output_filename, 'w', encoding='utf-8') as f:
             f.write(cleaned_lyrics)
             
         print(f"가사가 '{output_filename}' 파일로 저장되었습니다.")
-        # [수정] 성공 문자열 대신 '파일 경로'를 반환해야 다음 툴이 사용합니다.
         return output_filename 
 
     except Exception as e:
