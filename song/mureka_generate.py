@@ -23,7 +23,7 @@ HEADERS = {
 }
 
 @tool
-def generate_song_via_api(lyrics: str, prompt: str = "kpop") -> str:
+def generate_song_via_api(lyrics: str, prompt: str = "kpop, 1 min") -> str:
     """
     Mureka API를 사용하여 주어진 가사와 장르 프롬프트를 기반으로 노래를 생성합니다.
     이 툴은 노래 생성을 요청하고, 작업이 완료될 때까지 폴링(polling)한 후,
@@ -88,7 +88,29 @@ def generate_song_via_api(lyrics: str, prompt: str = "kpop") -> str:
                     mp3_url = first_choice.get('url')
                     
                     if mp3_url:
-                        return mp3_url # 👈 성공!
+                        print(f"⬇️ (Tool) MP3 다운로드 시작... ({mp3_url})")
+                        current_dir = os.path.dirname(os.path.abspath(__file__))
+                    
+                        project_root = os.path.dirname(current_dir)
+                        
+                        files_dir = os.path.join(project_root, "files")
+                        
+                        os.makedirs(files_dir, exist_ok=True)
+                        
+                        saved_filename = os.path.join(files_dir, "song.mp3")
+                        
+                        try:
+                            audio_res = requests.get(mp3_url)
+                            audio_res.raise_for_status()
+                            
+                            with open(saved_filename, 'wb') as f:
+                                f.write(audio_res.content)
+                                
+                            print(f"📂 (Tool) 파일 저장 완료: {saved_filename}")
+                            return saved_filename
+                            
+                        except Exception as download_err:
+                            return f"오류: MP3 다운로드 실패. {download_err}"
                     else:
                         return "오류: 'choices[0]' 안에 'url' 키가 없습니다."
                 else:
