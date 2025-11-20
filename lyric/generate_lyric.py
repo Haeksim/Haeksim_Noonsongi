@@ -103,7 +103,7 @@ def generate_lyrics_tool(topic_or_filepath: str, style: str="kpop") -> str:
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", "You are a professional lyricist. All responses must be in Korean."),
-        ("user", "'{topic_content}'라는 주제로 1분 이내 길이의 노래 가사를 생성해주세요. "
+        ("user", "'{topic_content}'라는 주제로 1분 길이의 노래 가사를 생성해주세요. "
                  "가사 구조는 반드시 [Verse 1], [Chorus], [Outro] 이 세 파트로만 구성되어야 합니다. "
                  "다른 파트는 절대 추가하지 마세요. "
                  "**결과물 맨 위에 노래 제목이나 '##' 같은 헤더를 절대 포함하지 마세요. 바로 [Verse 1]으로 시작하세요.** "
