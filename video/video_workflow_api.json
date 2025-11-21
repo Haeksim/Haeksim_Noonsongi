@@ -1,0 +1,47 @@
+{
+  "7": {
+    "inputs": {
+      "filename_prefix": "video/ByteDance-Seedance",
+      "format": "auto",
+      "codec": "auto",
+      "video-preview": "",
+      "video": [
+        "13",
+        0
+      ]
+    },
+    "class_type": "SaveVideo",
+    "_meta": {
+      "title": "비디오 저장"
+    }
+  },
+  "12": {
+    "inputs": {
+      "image": "nunsong_variation_4.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "이미지 로드"
+    }
+  },
+  "13": {
+    "inputs": {
+      "model": "seedance-1-0-pro-250528",
+      "prompt": "A journey through an infinite ocean of data, drifting through shimmering streams of information and floating feature vectors. A sense of wandering, exploration, and discovery as patterns slowly emerge from chaos. Futuristic digital landscape, glowing particles, depth, dynamic motion, cinematic lighting, high detail, smooth transitions, inspiring and immersive atmosphere.",
+      "resolution": "480p",
+      "aspect_ratio": "adaptive",
+      "duration": 5,
+      "seed": 127287191,
+      "camera_fixed": false,
+      "watermark": false,
+      "image": [
+        "12",
+        0
+      ]
+    },
+    "class_type": "ByteDanceImageToVideoNode",
+    "_meta": {
+      "title": "ByteDance Image to Video"
+    }
+  }
+}
