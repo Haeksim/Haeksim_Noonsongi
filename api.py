@@ -18,6 +18,11 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     prompt: str  # 프론트에서 { "prompt": "노래 만들어줘" } 형태로 보냄
+    
+@app.get("/api/test")
+async def test_api():
+    """서버가 정상 작동 중인지 확인하는 헬스 체크용 API"""
+    return {"status": "ok", "message": "API server is running normally!"}
 
 @app.post("/api/generate")
 async def generate_response(request: ChatRequest):
