@@ -20,6 +20,8 @@ async def main():
         print(response.get("output"))
     else:
         print(f"예상치 못한 응답 형식입니다: {response}")
+        
+    print("")
 
 if __name__ == "__main__":
     asyncio.run(main())
