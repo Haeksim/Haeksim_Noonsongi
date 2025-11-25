@@ -7,6 +7,13 @@ import os
 
 app = FastAPI()
 
+print("[DEBUG] CLOUD_URL =", os.getenv("CLOUD_URL"))
+print("[DEBUG] COMFY_API_KEY =", os.getenv("COMFY_API_KEY"))
+print("[DEBUG] GOOGLE_API_KEY =", os.getenv("GOOGLE_API_KEY"))
+print("[DEBUG] MUREKA_API_KEY =", os.getenv("MUREKA_API_KEY"))
+print("[DEBUG] MUREKA_API_URL =", os.getenv("MUREKA_API_URL"))
+
+
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
     CORSMiddleware,
