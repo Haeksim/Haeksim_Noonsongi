@@ -4,6 +4,7 @@ import magic
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
+
 key = os.getenv("GOOGLE_API_KEY_GEMINI")
 
 from langchain.tools import tool
