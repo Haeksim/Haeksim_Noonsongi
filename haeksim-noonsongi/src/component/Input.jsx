@@ -36,7 +36,7 @@ export default function Input() {
       const file = event.target.files[0];
       if (file) {
         setPrompt(file.name);
-        setPayload(file);
+        setPayload({ text: "", pdf: file });
       }
     });
     fileInput.click();
@@ -44,7 +44,7 @@ export default function Input() {
 
   useEffect(() => {
     handleInputBox();
-  }, [prompt]);
+  }, [input]);
   return (
     <div className={styles.inputContainer}>
       <div className={styles.input}>
@@ -59,7 +59,7 @@ export default function Input() {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               setPrompt(input);
-              setPayload(e.target.value);
+              setPayload({ text: input, pdf: null });
               setInput("");
             }
           }}
