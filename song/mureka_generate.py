@@ -7,9 +7,7 @@ from langchain.tools import tool
 load_dotenv() 
 
 MUREKA_API_KEY = os.environ.get("MUREKA_API_KEY")
-MUREKA_API_URL_BASE = os.environ.get("MUREKA_API_URL")
-
-MUREKA_API_URL = MUREKA_API_URL_BASE.rstrip('/') 
+MUREKA_API_URL = os.environ.get("MUREKA_API_URL")
 
 HEADERS = {
     "Authorization": f"Bearer {MUREKA_API_KEY}",
