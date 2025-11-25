@@ -10,7 +10,7 @@ app = FastAPI()
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://haeksimnoonsongi-production.up.railway.app/"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
