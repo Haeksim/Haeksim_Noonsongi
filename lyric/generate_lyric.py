@@ -4,6 +4,8 @@ import magic
 from pypdf import PdfReader
 from dotenv import load_dotenv
 
+key = os.getenv("GOOGLE_API_KEY_GEMINI")
+
 from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -12,7 +14,7 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY_GEMINI"),
+    google_api_key=key,
     transport="rest",
 )
 

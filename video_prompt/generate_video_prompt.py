@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 
+key = os.getenv("GOOGLE_API_KEY_GEMINI")
+
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -20,7 +22,7 @@ THEME_STYLE = (
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY_GEMINI"),
+    google_api_key=key,
     transport="rest",
 )
 
