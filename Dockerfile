@@ -26,5 +26,5 @@ RUN find . -type d -name "__pycache__" -exec rm -r {} +
 # 8. 포트
 EXPOSE 8000
 
-# 9. 실행
-CMD ["sh", "-c", "echo 'Checking env vars:' && env | grep GOOGLE && python -c 'import os; print(\"Python env:\", os.environ.get(\"GOOGLE_API_KEY_GEMINI\", \"NOT SET\"))' && uvicorn api:app --host 0.0.0.0 --port 8000"]
+# 9. 실행 - 전체 환경 변수 확인
+CMD ["sh", "-c", "echo '=== ALL ENV VARS ===' && env && echo '=== STARTING APP ===' && uvicorn api:app --host 0.0.0.0 --port 8000"]
