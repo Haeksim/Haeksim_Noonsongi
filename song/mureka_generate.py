@@ -9,12 +9,6 @@ load_dotenv()
 MUREKA_API_KEY = os.environ.get("MUREKA_API_KEY")
 MUREKA_API_URL_BASE = os.environ.get("MUREKA_API_URL")
 
-
-if not MUREKA_API_KEY:
-    raise ValueError("MUREKA_API_KEY가 .env 파일에 설정되지 않았습니다.")
-if not MUREKA_API_URL_BASE:
-    raise ValueError("MUREKA_API_URL이 .env 파일에 설정되지 않았습니다.")
-
 MUREKA_API_URL = MUREKA_API_URL_BASE.rstrip('/') 
 
 HEADERS = {
