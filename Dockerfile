@@ -7,10 +7,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# ❗ 3. Google ADC 비활성화(중요)
-ENV GOOGLE_APPLICATION_CREDENTIALS=""
-ENV NO_GCE_CHECK="true"
-
 # 4. 작업 디렉토리 설정
 WORKDIR /app
 
