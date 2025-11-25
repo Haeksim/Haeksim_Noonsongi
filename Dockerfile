@@ -7,13 +7,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 4. 작업 디렉토리 설정
+# 3. 작업 디렉토리 설정
 WORKDIR /app
 
-# 5-1. PyTorch CPU 설치
+# 4. PyTorch CPU 설치
 RUN pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
 
-# 5-2. requirements 설치
+# 5. requirements 설치
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -26,5 +26,5 @@ RUN find . -type d -name "__pycache__" -exec rm -r {} +
 # 8. 포트
 EXPOSE 8000
 
-# 9. 실행 - 전체 환경 변수 확인
-CMD ["sh", "-c", "echo '=== ALL ENV VARS ===' && env && echo '=== STARTING APP ===' && uvicorn api:app --host 0.0.0.0 --port 8000"]
+# 9. 실행
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
