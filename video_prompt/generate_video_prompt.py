@@ -18,7 +18,10 @@ THEME_STYLE = (
     "unreal engine 5 render style, slight volumetric fog"
 )
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=os.getenv("GOOGLE_API_KEY")
+)
 
 
 # -------------------- 유틸 함수 --------------------
