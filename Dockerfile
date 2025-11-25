@@ -4,7 +4,7 @@ FROM python:3.11.14-slim
 # 2. 시스템 패키지 설치
 # apt 캐시 삭제로 용량 절약
 RUN apt-get update && \
-    apt-get install -y ffmpeg && \
+    apt-get install -y ffmpeg libmagic1 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
