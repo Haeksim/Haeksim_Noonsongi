@@ -9,7 +9,7 @@ key = os.getenv("GOOGLE_API_KEY_GEMINI")
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from pydub import AudioSegment  # <-- 추가됨
+from pydub import AudioSegment
 
 load_dotenv()
 
@@ -25,9 +25,6 @@ llm = ChatGoogleGenerativeAI(
     google_api_key=key,
     transport="rest",
 )
-
-
-# -------------------- 유틸 함수 --------------------
 
 def parse_time(time_str: str) -> float:
     """SRT 시간 포맷을 float(seconds)로 변환."""
@@ -86,9 +83,6 @@ def get_lyrics_for_segment(subtitles, seg_start, seg_end):
     return " ".join(dict.fromkeys(segment_texts))
 
 
-
-# -------------------- 메인 툴 --------------------
-
 @tool
 def generate_video_prompt_tool(srt_file_path: str) -> list:
     """
@@ -97,7 +91,6 @@ def generate_video_prompt_tool(srt_file_path: str) -> list:
 
     print(f"SRT 분석 시작: {srt_file_path}")
 
-    # 1) SRT 로드
     try:
         subtitles = parse_srt(srt_file_path)
     except FileNotFoundError as e:
