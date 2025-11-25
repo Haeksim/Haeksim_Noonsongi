@@ -12,6 +12,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from pydub import AudioSegment
 
 load_dotenv()
+# key = os.getenv("GOOGLE_API_KEY_GEMINI") # 로컬 테스트용 
 
 TOTAL_SEGMENTS = 8
 THEME_STYLE = (
