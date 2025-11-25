@@ -1,5 +1,8 @@
 import os
 from dotenv import load_dotenv
+
+key = os.getenv("GOOGLE_API_KEY_GEMINI")
+
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langchain.agents import create_agent
@@ -18,7 +21,7 @@ from merge_video.merge_video import merge_video_tool
 load_dotenv()
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
-    google_api_key=os.getenv("GOOGLE_API_KEY_GEMINI"),
+    google_api_key=key,
     transport="rest",
 )
 
