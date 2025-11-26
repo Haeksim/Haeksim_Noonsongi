@@ -15,7 +15,7 @@ HEADERS = {
 }
 
 @tool
-def generate_song_via_api(lyrics: str, prompt: str = "kpop, 1 min, less interlude") -> str:
+def generate_song_via_api(lyrics: str, prompt: str = "kpop, 1 min, less interlude, fast tempo") -> str:
     """
     Mureka API를 사용하여 주어진 가사와 장르 프롬프트를 기반으로 노래를 생성합니다.
     이 툴은 노래 생성을 요청하고, 작업이 완료될 때까지 폴링(polling)한 후,
@@ -37,10 +37,13 @@ def generate_song_via_api(lyrics: str, prompt: str = "kpop, 1 min, less interlud
     print(f"🎵 (Tool) 1. Mureka API에 노래 생성을 요청합니다...")
     print(f"   (호출 주소: {generation_url})")
     
+    constraint_keywords = ", fast tempo, short song, under 60 seconds, no instrumental intro, no long interlude, end immediately after lyrics"
+    final_prompt = f"{prompt}{constraint_keywords}"
+    
     payload = {
         "lyrics": lyrics,
         "model": "auto",
-        "prompt": prompt
+        "prompt": final_prompt
     }
     
     try:
