@@ -91,6 +91,23 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         else:
             final_path = "No output generated"
 
+        print(f"[Debug] final_path type: {type(final_path)}")
+        print(f"[Debug] final_path content: {final_path}")
+
+        if isinstance(final_path, list):
+            if len(final_path) > 0:
+                # 리스트의 첫 번째 요소 사용
+                final_path = str(final_path[0])
+            else:
+                final_path = "Empty result list"
+        elif isinstance(final_path, dict):
+            # 딕셔너리인 경우 JSON 문자열로 변환
+            import json
+            final_path = json.dumps(final_path, ensure_ascii=False)
+        elif not isinstance(final_path, str):
+            # 문자열이 아닌 다른 타입인 경우
+            final_path = str(final_path)
+
         # 작업 완료 처리
         tasks[task_id]["status"] = "completed"
         tasks[task_id]["result"] = final_path.strip()
