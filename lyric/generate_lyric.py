@@ -110,13 +110,18 @@ def generate_lyrics_tool(topic_or_filepath: str, style: str="kpop") -> str:
         return topic_content
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are a professional lyricist. All responses must be in Korean."),
+        ("system", "You are a professional lyricist. All responses must be in Korean. "
+                   "**절대로 다음 형식 규칙을 어겨서는 안 됩니다.**"), # 시스템 프롬프트 강화
         ("user", "'{topic_content}'라는 주제로 1분 길이의 노래 가사를 생성해주세요. "
-                 "가사 구조는 반드시 [Verse 1], [Outro] 이 두 파트**만**으로, 각각 **단 한 번씩** 구성되어야 합니다."
-                 "[Verse 2], 두 번째 [Chorus], [Bridge], [Pre-Chorus] 등 다른 파트나 반복되는 파트는 절대 추가하지 마세요."
-                 "한 파트 당 문장의 길이가 25자를 넘지 않도록 하세요. "
-                 "**결과물 맨 위에 노래 제목이나 '##' 같은 헤더를 절대 포함하지 마세요. 바로 [Verse 1]으로 시작하세요.** "
-                 "**와 같은 bold체는 제외해주세요. {style}")
+                 "**[Verse 1]과 [Outro] 두 파트만**으로, 각각 **단 한 번씩** 구성해야 합니다. "
+                 "**다른 파트([Verse 2], [Chorus], [Bridge] 등)는 절대 포함하지 마세요.**\n\n"
+                 "--- 형식 규칙 (필수 준수 사항) ---\n"
+                 "1. **문장 길이 제한:** 각 문장의 길이는 **최대 25자**를 넘을 수 없습니다.\n"
+                 "2. **파트당 라인 수 제한:** [Verse 1]은 **최대 8줄**, [Outro]는 **최대 4줄**로 구성합니다.\n" # 라인 수 제한 추가
+                 "3. **시작 형식:** 결과물은 **노래 제목이나 다른 텍스트 없이 바로 [Verse 1]으로 시작**해야 합니다.\n"
+                 "4. **스타일:** {style} 스타일로 작성해주세요.\n"
+                 "-------------------------------\n\n"
+                 "**규칙을 어기면 안 됩니다. 문장 길이와 파트 구성을 엄격히 지키세요.**") # 최종 경고 추가
     ])
     output_parser = StrOutputParser() | clean_lyrics_output
     lyric_chain = prompt | llm | output_parser
@@ -176,3 +181,74 @@ def read_lyrics_file_tool(filepath: str) -> str:
     except Exception as e:
         print(f"오류: '{filepath}' 파일 읽기 실패. {e}")
         return f"오류: '{filepath}' 파일 읽기 실패. {e}"
+    
+# test code!!! 
+# (기존 코드의 맨 끝에 추가)
+
+# --- 2. 테스트 환경 설정 ---
+# NOTE: 이 스크립트가 실행될 때, 'files/test_topic.pdf' 경로에 실제 PDF 파일이 존재해야 합니다.
+def setup_test_environment():
+    """테스트를 위한 'files' 폴더를 생성합니다."""
+    # 현재 스크립트의 디렉토리를 기준으로 'files' 폴더를 찾거나 생성
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir) # 스크립트가 포함된 폴더의 부모 폴더를 프로젝트 루트로 가정
+    files_dir = os.path.join(project_root, "files")
+    
+    # files_dir 생성
+    os.makedirs(files_dir, exist_ok=True)
+    
+    # 가상의 PDF 파일 경로 (실제 파일을 여기에 넣어주세요)
+    test_pdf_path = os.path.join(files_dir, "test_topic.pdf")
+    
+    # 환경 변수 로드 확인
+    if not os.getenv("GOOGLE_API_KEY_GEMINI"):
+        print("🚨 경고: GOOGLE_API_KEY_GEMINI 환경 변수가 설정되지 않았습니다.")
+        print("API 키를 .env 파일에 설정하거나 직접 할당해야 합니다.")
+    
+    return test_pdf_path
+
+# --- 3. 메인 테스트 함수 ---
+def main_test():
+    # 1. 테스트 환경 설정 및 PDF 파일 경로 획득
+    pdf_filepath = setup_test_environment()
+    
+    print("\n=============================================")
+    print(f"** 테스트 시작 (PDF 파일 경로: {pdf_filepath}) **")
+    
+    if not os.path.exists(pdf_filepath):
+        print("❌ 테스트 실패: 지정된 경로에 PDF 파일이 없습니다.")
+        print(f"   테스트를 위해 '{pdf_filepath}' 경로에 PDF 파일을 넣어주세요.")
+        return
+        
+    # 2. generate_lyrics_tool 호출
+    topic_style = "힙합 (Hip-Hop)"
+    
+    print(f"\n🔍 툴 호출: generate_lyrics_tool(주제: PDF 파일, 스타일: {topic_style})")
+    
+    # PDF 파일 경로를 인자로 전달
+    result_filepath = generate_lyrics_tool(
+        topic_or_filepath=pdf_filepath, 
+        style=topic_style
+    )
+    
+    print("\n=============================================")
+    print(f"** 가사 생성 결과 (반환 경로): {result_filepath} **")
+    print("=============================================")
+    
+    # 3. 결과 파일 내용 확인 (선택 사항)
+    if not "실패:" in result_filepath and os.path.exists(result_filepath):
+        print("✅ 가사 파일 내용 확인:")
+        lyrics = read_lyrics_file_tool(result_filepath)
+        print("---------------------------------")
+        print(lyrics)
+        print("---------------------------------")
+        
+    elif "오류:" in result_filepath:
+        print(f"❌ 툴 실행 중 오류 발생: {result_filepath}")
+        
+    else:
+        print("❌ 툴 실행 실패 또는 가사 파일 경로가 유효하지 않음.")
+
+# 스크립트가 직접 실행될 때만 main_test 함수 호출
+if __name__ == "__main__":
+    main_test()
