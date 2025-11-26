@@ -85,7 +85,10 @@ def merge_video_tool(dummy: str = "start") -> str:
     _run_ffmpeg(concat_cmd)
 
     # 2) subtitles + audio
-    filter_sub = f"subtitles='{os.path.abspath(SONG_SRT)}':force_style='Alignment=2,FontSize=12'"
+    filter_sub = (
+        f"subtitles='{os.path.abspath(SONG_SRT)}':force_style="
+        "'Alignment=2,FontSize=16,FontName=NanumGothic,Outline=1,Shadow=0'"
+    )
 
     final_cmd = [
         "ffmpeg", "-y",
