@@ -12,7 +12,7 @@ import ssl
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
-app.mount("/", StaticFiles(directory="output_files"), name="static_root_files") 
+app.mount("/static", StaticFiles(directory="output_files"), name="static")
 
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
