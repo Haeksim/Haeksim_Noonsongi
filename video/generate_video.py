@@ -113,6 +113,11 @@ class ComfyCloudClient:
         upload_resp = self.upload_image(local_image_path, overwrite=True)
         server_filename = upload_resp['name']
 
+        save_video_node_id = "7"
+        filename_prefix = f"video/ByteDance-Seedance_{index}"
+        workflow[save_video_node_id]["inputs"]["filename_prefix"] = filename_prefix
+        print(f"[*] Workflow updated: Node {save_video_node_id} filename_prefix='{filename_prefix}'")
+
         # ComfyUI workflow 이미지 노드 12번에 파일명 삽입
         workflow[image_node_id]["inputs"]["image"] = server_filename
         print(f"[*] Workflow updated: Node {image_node_id} set to '{server_filename}'")
