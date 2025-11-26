@@ -1,4 +1,4 @@
-import websocket
+from websocket import create_connection
 import uuid
 import json
 import urllib.request
