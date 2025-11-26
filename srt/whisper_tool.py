@@ -13,7 +13,7 @@ from langchain.tools import tool
 
 print("⏳ Whisper 모델 로딩 중... (최초 1회)")
 try:
-    model = stable_whisper.load_model("tiny")
+    model = stable_whisper.load_model("base")
     print("✅ Whisper 모델 로드 완료.")
 except Exception as e:
     print(f"⚠️ 모델 로드 실패: {e}")
