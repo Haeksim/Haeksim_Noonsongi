@@ -85,7 +85,7 @@ class ComfyCloudClient:
         return response.json()
 
     @staticmethod
-    def inject_prompt_to_workflow(workflow, prompt: str, time: int):
+    def inject_prompt_to_workflow(workflow, prompt: str, time: int, index: int):
         prompt_node_id = "13"
         image_node_id = "12"
 
@@ -98,6 +98,11 @@ class ComfyCloudClient:
 
         # 이미지 경로 직접 저장
         workflow[image_node_id]["inputs"]["images"] = selected_image
+
+        # 파일 명 저장
+        save_video_node_id = "7"
+        filename_prefix = f"video/ByteDance-Seedance_{index}"
+        workflow[save_video_node_id]["inputs"]["filename_prefix"] = filename_prefix
 
         return workflow
 
@@ -112,11 +117,6 @@ class ComfyCloudClient:
         print(f"[*] Uploading image: {local_image_path}")
         upload_resp = self.upload_image(local_image_path, overwrite=True)
         server_filename = upload_resp['name']
-
-        save_video_node_id = "7"
-        filename_prefix = f"video/ByteDance-Seedance_{index}"
-        workflow[save_video_node_id]["inputs"]["filename_prefix"] = filename_prefix
-        print(f"[*] Workflow updated: Node {save_video_node_id} filename_prefix='{filename_prefix}'")
 
         # ComfyUI workflow 이미지 노드 12번에 파일명 삽입
         workflow[image_node_id]["inputs"]["image"] = server_filename
@@ -237,7 +237,7 @@ def generate_video_tool(index: int, cloud_url: str = None) -> list:
         workflow = json.load(f)
     
     # inject prompt + time + image
-    workflow = ComfyCloudClient.inject_prompt_to_workflow(workflow, prompt, time)
+    workflow = ComfyCloudClient.inject_prompt_to_workflow(workflow, prompt, time, index)
 
     # 임시 workflow 저장
     tmp_workflow_path = os.path.join(current_dir, f"workflow_index_{index}.json")
