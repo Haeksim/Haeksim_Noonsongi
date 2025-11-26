@@ -5,7 +5,7 @@ from langchain_core.tools import tool
 
 
 INPUT_DIR = "files/generated_videos"
-OUTPUT_DIR = "files"
+OUTPUT_DIR = "output_files"
 SONG_MP3 = "files/song.mp3"
 SONG_SRT = "files/song.srt"
 
