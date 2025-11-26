@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import PayloadContext from "../context/PayloadContext";
+import { postSearch, getSearchResult } from "../api/search";
+
 import styles from "./Input.module.css";
 import add from "../icon/add.png";
-import PayloadContext from "../context/PayloadContext";
 
 export default function Input() {
   const [input, setInput] = useState("");
-  const { prompt, setPrompt, payload, setPayload } = useContext(PayloadContext);
+  const { prompt, setPrompt, payload, setPayload, result, setResult } =
+    useContext(PayloadContext);
   const textareaRef = useRef(null);
 
   //인풋 상자 크기 조정 로직
@@ -36,11 +39,36 @@ export default function Input() {
       const file = event.target.files[0];
       if (file) {
         setPrompt(file.name);
-        setPayload({ text: "", pdf: file });
+        setPayload({ prompt: "", file: file });
       }
     });
     fileInput.click();
   };
+
+  //폴링 기다리기
+  function pollStatus(taskId) {
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(async () => {
+        try {
+          const res = await getSearchResult(taskId);
+          const status = res.data.status;
+
+          if (status === "completed") {
+            clearInterval(interval);
+            resolve(res.data.result); // return the result properly
+          } else if (status === "failed") {
+            clearInterval(interval);
+            reject(res.data.error); // reject if failed
+          } else {
+            console.log("생성 중... (현재 상태: " + status + ")");
+          }
+        } catch (err) {
+          clearInterval(interval);
+          reject(err);
+        }
+      }, 4000);
+    });
+  }
 
   useEffect(() => {
     handleInputBox();
@@ -55,12 +83,16 @@ export default function Input() {
           value={input}
           onChange={handleInput}
           onInput={handleInputBox}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               setPrompt(input);
-              setPayload({ text: input, pdf: null });
+              setPayload({ prompt: input, file: "" });
               setInput("");
+              const taskId = await postSearch(payload);
+              console.log(taskId);
+              const result = await pollStatus(taskId);
+              setResult(result);
             }
           }}
           className={styles.textarea}

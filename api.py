@@ -28,7 +28,6 @@ async def test_api():
     return {"status": "ok", "message": "API server is running normally!"}
 
 
-# --- [핵심 추가] 실제 오래 걸리는 작업을 처리하는 함수 (백그라운드용) ---
 async def process_generation(task_id: str, prompt: str, file_path: str):
     try:
         # 상태 업데이트: 처리 중
@@ -71,7 +70,6 @@ async def generate_response(
 ):
     try:
         # 1. 파일 서버에 저장하기 (프로젝트 루트 폴더)
-        # 별도 폴더 없이 파일명 그대로 사용
         file_path = file.filename
         
         with open(file_path, "wb") as buffer:
