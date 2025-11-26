@@ -1,0 +1,8 @@
+.git
+.venv
+venv
+__pycache__
+files/generated_videos/*
+*.mp4
+*.png
+.env
