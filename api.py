@@ -206,9 +206,11 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
             # 2. 파일 복사/이동 (Agent가 생성한 파일이 존재할 경우)
             if os.path.exists(processed_path):
                 destination_path = os.path.join(OUTPUT_FILES_DIR, file_name)
-                # [수정] shutil.copy는 이미 덮어쓰기를 수행합니다.
-                shutil.copy(processed_path, destination_path)
-                print(f"✅ 결과 파일 output_files로 복사 (덮어쓰기) 완료: {destination_path}")
+                if os.path.abspath(processed_path) != os.path.abspath(destination_path):
+                    shutil.copy(processed_path, destination_path)
+                    print(f"결과 파일 output_files로 복사 (덮어쓰기) 완료: {destination_path}")
+                else:
+                    print("동일 파일 경로 감지: copy 수행하지 않음.")
             
             # 3. URL 생성: https://도메인/static/파일명
             base_url = DOMAIN_URL.rstrip('/')
