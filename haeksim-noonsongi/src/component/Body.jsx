@@ -6,8 +6,10 @@ import StartBody from "./StartBody";
 import SearchBody from "./SearchBody";
 
 export default function Body() {
-  const { prompt } = useContext(PayloadContext);
+  const { payload } = useContext(PayloadContext);
   return (
-    <div className={styles.body}>{prompt ? <SearchBody /> : <StartBody />}</div>
+    <div className={styles.body}>
+      {payload.file && payload.prompt ? <SearchBody /> : <StartBody />}
+    </div>
   );
 }

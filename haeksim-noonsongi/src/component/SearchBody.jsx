@@ -10,7 +10,7 @@ export default function SearchBody() {
   return (
     <div>
       <Chat owner={"user"}>
-        <p>{prompt}</p>
+        <p>{`${payload.file.name} \n ${payload.prompt}`}</p>
       </Chat>
       {result && (
         <Chat owner={"ai"}>

@@ -39,10 +39,34 @@ export default function Input() {
       const file = event.target.files[0];
       if (file) {
         setPrompt(file.name);
-        setPayload({ prompt: "", file: file });
+        setPayload((prev) => ({ ...prev, file: file }));
       }
     });
     fileInput.click();
+  };
+
+  const handleEnter = async (e) => {
+    try {
+      const nextPayload = {
+        ...payload,
+        prompt: e.target.value,
+      };
+
+      setPrompt(input);
+      setPayload(nextPayload);
+      setInput("");
+
+      const taskId = await postSearch(nextPayload);
+      console.log(taskId);
+
+      if (taskId) {
+        const result = await pollStatus(taskId);
+        console.log(result);
+        setResult(result);
+      }
+    } catch (e) {
+      alert(e);
+    }
   };
 
   //폴링 기다리기
@@ -75,6 +99,9 @@ export default function Input() {
   }, [input]);
   return (
     <div className={styles.inputContainer}>
+      <div className={styles.attachmentTab}>
+        <p>{payload.file?.name}</p>
+      </div>
       <div className={styles.input}>
         <textarea
           rows={1}
@@ -86,13 +113,7 @@ export default function Input() {
           onKeyDown={async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              setPrompt(input);
-              setPayload({ prompt: input, file: "" });
-              setInput("");
-              const taskId = await postSearch(payload);
-              console.log(taskId);
-              const result = await pollStatus(taskId);
-              setResult(result);
+              await handleEnter(e);
             }
           }}
           className={styles.textarea}
