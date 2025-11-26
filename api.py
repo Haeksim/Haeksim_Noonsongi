@@ -84,37 +84,53 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         
         # 결과 추출
         final_path = ""
-        if "messages" in response:
-            final_path = response['messages'][-1].content
+        if "messages" in response and response["messages"]:
+            last_message = response['messages'][-1]
+            
+            # last_message가 content 속성을 가진 객체인 경우
+            if hasattr(last_message, 'content'):
+                content = last_message.content
+                
+                # content가 리스트인 경우 (현재 상황)
+                if isinstance(content, list) and len(content) > 0:
+                    first_item = content[0]
+                    
+                    # 딕셔너리이고 'text' 키가 있는 경우
+                    if isinstance(first_item, dict) and 'text' in first_item:
+                        final_path = first_item['text']
+                    else:
+                        final_path = str(first_item)
+                        
+                # content가 문자열인 경우
+                elif isinstance(content, str):
+                    final_path = content
+                else:
+                    final_path = str(content)
+                    
+            # last_message가 문자열인 경우
+            elif isinstance(last_message, str):
+                final_path = last_message
+            else:
+                final_path = str(last_message)
+                
         elif "output" in response:
-            final_path = response.get("output")
+            final_path = response.get("output", "")
         else:
             final_path = "No output generated"
-
-        print(f"[Debug] final_path type: {type(final_path)}")
-        print(f"[Debug] final_path content: {final_path}")
-
-        if isinstance(final_path, list):
-            if len(final_path) > 0:
-                # 리스트의 첫 번째 요소 사용
-                final_path = str(final_path[0])
-            else:
-                final_path = "Empty result list"
-        elif isinstance(final_path, dict):
-            # 딕셔너리인 경우 JSON 문자열로 변환
-            import json
-            final_path = json.dumps(final_path, ensure_ascii=False)
-        elif not isinstance(final_path, str):
-            # 문자열이 아닌 다른 타입인 경우
+        
+        # 문자열이 아닌 경우 변환
+        if not isinstance(final_path, str):
             final_path = str(final_path)
 
         # 작업 완료 처리
         tasks[task_id]["status"] = "completed"
-        tasks[task_id]["result"] = final_path.strip()
+        tasks[task_id]["result"] = final_path.strip() if final_path else "No output generated"
         print(f"✅ [Task {task_id}] 작업 완료: {final_path}")
 
     except Exception as e:
         print(f"❌ [Task {task_id}] 에러 발생: {e}")
+        import traceback
+        traceback.print_exc()
         tasks[task_id]["status"] = "failed"
         tasks[task_id]["error"] = str(e)
 
