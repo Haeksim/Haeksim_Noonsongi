@@ -9,8 +9,7 @@ OUTPUT_DIR = "output_files"
 SONG_MP3 = "files/song.mp3"
 SONG_SRT = "files/song.srt"
 
-FILENAME_PREFIX = "ByteDance-Seedance_"
-FILE_PATTERN = r"ByteDance-Seedance_(\d+)_\.mp4"
+FILE_PATTERN = r"ByteDance-Seedance_(\d+)_\d+_\.mp4"
 
 
 def _run_ffmpeg(cmd: list):
@@ -29,8 +28,14 @@ def _get_ordered_video_list():
     for f in files:
         m = re.match(FILE_PATTERN, f)
         if m:
+            # 정규식의 첫 번째 그룹(\d+)인 인덱스를 추출
             num = int(m.group(1))
-            matched.append((num, os.path.join(INPUT_DIR, f)))
+            full_path = os.path.join(INPUT_DIR, f)
+            matched.append((num, full_path))
+            print(f"  - 매칭 성공: [Index {num}] {f}")
+        else:
+            if f.endswith(".mp4"):
+                print(f"  - 매칭 실패 (패턴 불일치): {f}")
 
     if not matched:
         raise Exception("generated_videos 폴더에서 대상 mp4 파일을 찾을 수 없습니다.")
@@ -42,13 +47,18 @@ def _get_ordered_video_list():
 @tool
 def merge_video_tool(dummy: str = "start") -> str:
     """
-    generated_video 폴더의 ByteDance-Seedance_00003_.mp4 형식 파일들을
-    번호 순대로 병합하고, song.srt 자막 + song.mp3 배경음악을 적용해 최종 mp4 생성.
+    generated_video 폴더의 파일들을 번호 순서대로 병합하고, 
+    song.srt 자막 + song.mp3 배경음악을 적용해 최종 mp4 생성.
     """
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    video_list = _get_ordered_video_list()
+    try:
+        video_list = _get_ordered_video_list()
+    except Exception as e:
+        return f"Error finding videos: {e}"
+
+    print(f"[*] 병합 대상 파일 개수: {len(video_list)}개")
 
     concat_list_path = os.path.join(OUTPUT_DIR, "concat_list.txt")
     with open(concat_list_path, "w") as f:
@@ -89,5 +99,5 @@ def merge_video_tool(dummy: str = "start") -> str:
     print("[*] Adding music + subtitles…")
     _run_ffmpeg(final_cmd)
     
-
+    print(f"✅ 최종 영상 생성 완료: {final_output_path}")
     return final_output_path
