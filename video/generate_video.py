@@ -121,10 +121,13 @@ class ComfyCloudClient:
         ws_url = f"{self.get_ws_url()}/ws?clientId={self.client_id}"
         print(f"ws_url: {ws_url}")
         
-        ws = websocket.WebSocket()
-        
         try:
-            ws.connect(ws_url, sslopt={"cert_reqs": ssl.CERT_NONE})
+            # create_connection 사용
+            ws = websocket.create_connection(
+                ws_url, 
+                timeout=30,
+                sslopt={"cert_reqs": ssl.CERT_NONE}
+            )
             print(f"[*] WebSocket Connected: {ws_url}")
         except Exception as e:
             print(f"[!] WebSocket Connection Failed: {e}")
