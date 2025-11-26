@@ -68,6 +68,8 @@ async def test_websocket_connection():
 
 
 async def process_generation(task_id: str, prompt: str, file_path: str):
+    CLOUD_URL = os.getenv("CLOUD_URL")
+    
     try:
         # 상태 업데이트: 처리 중
         tasks[task_id]["status"] = "processing"
@@ -121,11 +123,20 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         # 문자열이 아닌 경우 변환
         if not isinstance(final_path, str):
             final_path = str(final_path)
+        
+        processed_path = final_path.strip()
+        final_url = processed_path
+        
+        if CLOUD_URL and not processed_path.startswith("http"):
+            # CLOUD_URL의 마지막 /는 제거하고 파일 경로의 시작 /는 제거하여 합침
+            base_url = CLOUD_URL.rstrip('/')
+            file_name = processed_path.lstrip('/')
+            final_url = f"{base_url}/{file_name}"
 
         # 작업 완료 처리
         tasks[task_id]["status"] = "completed"
-        tasks[task_id]["result"] = final_path.strip() if final_path else "No output generated"
-        print(f"✅ [Task {task_id}] 작업 완료: {final_path}")
+        tasks[task_id]["result"] = final_url
+        print(f"✅ [Task {task_id}] 작업 완료: {final_url}")
 
     except Exception as e:
         print(f"❌ [Task {task_id}] 에러 발생: {e}")
@@ -133,6 +144,31 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         traceback.print_exc()
         tasks[task_id]["status"] = "failed"
         tasks[task_id]["error"] = str(e)
+
+
+async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
+    CLOUD_URL = os.getenv("CLOUD_URL")
+    
+    try:
+        tasks[task_id]["status"] = "processing"
+        print(f"🔄 [Fake Task {task_id}] 가짜 작업 시작. {wait_time}초 대기...")
+
+        await asyncio.sleep(wait_time)
+        
+        processed_path = "result.mp4"
+        base_url = CLOUD_URL.rstrip('/')
+        final_url = f"{base_url}/{processed_path}"
+
+        tasks[task_id]["status"] = "completed"
+        tasks[task_id]["result"] = final_url
+        tasks[task_id]["message"] = f"Fake completed after {wait_time} seconds with prompt: {prompt}"
+        print(f"✅ [Fake Task {task_id}] 가짜 작업 완료: {final_url}")
+
+    except Exception as e:
+        print(f"❌ [Fake Task {task_id}] 에러 발생: {e}")
+        tasks[task_id]["status"] = "failed"
+        tasks[task_id]["error"] = str(e)
+
 
 @app.post("/api/generate")
 async def generate_response(
@@ -172,6 +208,41 @@ async def generate_response(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/api/generate_fake")
+async def generate_fake_response_async(
+    background_tasks: BackgroundTasks,
+    prompt: str = Form(...),
+    file: UploadFile = File(None) 
+):
+    """
+    프론트엔드 테스트용 비동기 API. 입력 프롬프트와 파일명을 받고, 
+    5초~15초 사이를 랜덤으로 대기한 후 가짜 output.mp4 URL을 반환합니다.
+    """
+    import random
+    
+    # 5초에서 15초 사이 랜덤 대기 시간 설정
+    wait_time = random.randint(5, 15) 
+
+    task_id = str(uuid.uuid4())
+
+    tasks[task_id] = {
+        "status": "queued",
+        "result": None,
+        "error": None
+    }
+
+    # 파일이 넘어왔다면, 파일 저장 및 절대 경로 생성 로직이 필요합니다.
+    # 여기서는 가짜 테스트를 위해 파일을 저장하지 않고 바로 가짜 작업으로 넘깁니다.
+    
+    background_tasks.add_task(process_fake_generation, task_id, prompt, wait_time)
+
+    return {
+        "task_id": task_id,
+        "status": "queued",
+        "message": f"가짜 작업이 시작되었습니다. {wait_time}초 후 완료됩니다."
+    }
     
 
 @app.get("/api/status/{task_id}")
