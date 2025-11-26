@@ -197,7 +197,7 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
             # CLOUD_URL의 마지막 /는 제거하고 파일 경로의 시작 /는 제거하여 합침
             base_url = CLOUD_URL.rstrip('/')
             file_name = processed_path.lstrip('/')
-            final_url = f"{base_url}/{file_name}"
+            final_url = f"{base_url}/static/{file_name.replace(os.path.sep, '/')}"
 
         # 작업 완료 처리
         tasks[task_id]["status"] = "completed"
@@ -223,7 +223,7 @@ async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
         
         processed_path = "result.mp4"
         base_url = CLOUD_URL.rstrip('/')
-        final_url = f"{base_url}/{processed_path}"
+        final_url = f"{base_url}/static/{processed_path.replace(os.path.sep, '/')}" 
 
         tasks[task_id]["status"] = "completed"
         tasks[task_id]["result"] = final_url
