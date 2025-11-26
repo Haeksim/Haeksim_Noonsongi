@@ -10,9 +10,14 @@ import asyncio
 import websocket
 import ssl  
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="output_files"), name="static")
+OUTPUT_FILES_DIR = "output_files"
+os.makedirs(OUTPUT_FILES_DIR, exist_ok=True) 
+app.mount("/static", StaticFiles(directory=OUTPUT_FILES_DIR), name="static_files") 
 
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
@@ -194,11 +199,21 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         final_url = processed_path
         
         if CLOUD_URL and not processed_path.startswith("http"):
-            # CLOUD_URL의 마지막 /는 제거하고 파일 경로의 시작 /는 제거하여 합침
+            
+            # 1. 파일 이름만 추출
+            file_name = os.path.basename(processed_path)
+            
+            # 2. 파일 복사/이동 (Agent가 생성한 파일이 존재할 경우)
+            if os.path.exists(processed_path):
+                destination_path = os.path.join(OUTPUT_FILES_DIR, file_name)
+                # [수정] shutil.copy는 이미 덮어쓰기를 수행합니다.
+                shutil.copy(processed_path, destination_path)
+                print(f"✅ 결과 파일 output_files로 복사 (덮어쓰기) 완료: {destination_path}")
+            
+            # 3. URL 생성: https://도메인/static/파일명
             base_url = CLOUD_URL.rstrip('/')
-            file_name = processed_path.lstrip('/')
             final_url = f"{base_url}/static/{file_name.replace(os.path.sep, '/')}"
-
+            
         # 작업 완료 처리
         tasks[task_id]["status"] = "completed"
         tasks[task_id]["result"] = final_url
@@ -221,9 +236,14 @@ async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
 
         await asyncio.sleep(wait_time)
         
-        processed_path = "result.mp4"
+        processed_path = "result.mp4" 
+        
+        # URL 생성
         base_url = CLOUD_URL.rstrip('/')
+        
+        # 파일 이름만 URL에 붙여서 /static/파일명 형태로 생성
         final_url = f"{base_url}/static/{processed_path.replace(os.path.sep, '/')}" 
+
 
         tasks[task_id]["status"] = "completed"
         tasks[task_id]["result"] = final_url
@@ -236,6 +256,40 @@ async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
         tasks[task_id]["error"] = str(e)
 
 
+# --- [추가] 로컬 환경 테스트용 가짜 작업 처리 함수 ---
+async def process_local_fake_generation(task_id: str, prompt: str, wait_time: int):
+    # 로컬 테스트에서는 CLOUD_URL 환경변수를 사용하지 않습니다.
+    LOCAL_URL = "http://127.0.0.1:8000" 
+    
+    try:
+        tasks[task_id]["status"] = "processing"
+        print(f"🔄 [Local Fake Task {task_id}] 로컬 테스트 시작. {wait_time}초 대기...")
+
+        await asyncio.sleep(wait_time)
+        
+        processed_path = "result.mp4" 
+        
+        # 가짜 파일을 output_files 폴더에 생성 (노출용)
+        dummy_file_path = os.path.join(OUTPUT_FILES_DIR, processed_path)
+        # 빈 더미 파일 생성 (없으면 404가 뜨므로 반드시 필요)
+        with open(dummy_file_path, "w") as f:
+            f.write("DUMMY VIDEO FILE FOR LOCAL TEST")
+        print(f"✅ 더미 파일 생성: {dummy_file_path}")
+        
+        # URL 생성: 로컬 주소와 /static/파일명 형태로 생성
+        final_url = f"{LOCAL_URL}/static/{processed_path.replace(os.path.sep, '/')}" 
+
+        tasks[task_id]["status"] = "completed"
+        tasks[task_id]["result"] = final_url
+        tasks[task_id]["message"] = f"Local Fake completed after {wait_time} seconds with prompt: {prompt}"
+        print(f"✅ [Local Fake Task {task_id}] 가짜 작업 완료: {final_url}")
+
+    except Exception as e:
+        print(f"❌ [Local Fake Task {task_id}] 에러 발생: {e}")
+        tasks[task_id]["status"] = "failed"
+        tasks[task_id]["error"] = str(e)
+
+
 @app.post("/api/generate")
 async def generate_response(
     background_tasks: BackgroundTasks, # FastAPI의 백그라운드 기능
@@ -243,8 +297,12 @@ async def generate_response(
     file: UploadFile = File(...)
 ):
     try:
-        # 1. 파일 서버에 저장하기 (프로젝트 루트 폴더)
-        file_path = file.filename
+        # [핵심 수정 6] 파일 이름 중복 방지: UUID와 원래 파일명 조합
+        original_file_name = file.filename
+        unique_file_name = f"{uuid.uuid4()}_{original_file_name}"
+        
+        # 1. 파일 서버에 저장하기 (프로젝트 루트 폴더에 임시 저장)
+        file_path = unique_file_name
         
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -308,6 +366,38 @@ async def generate_fake_response_async(
         "task_id": task_id,
         "status": "queued",
         "message": f"가짜 작업이 시작되었습니다. {wait_time}초 후 완료됩니다."
+    }
+
+# --- [추가] 로컬 테스트용 가짜 API ---
+@app.post("/api/generate_fake2")
+async def generate_fake2_async(
+    background_tasks: BackgroundTasks,
+    prompt: str = Form(...),
+    file: UploadFile = File(None) 
+):
+    """
+    로컬 환경에서 output_files/result.mp4 파일 접근 테스트용 비동기 API.
+    """
+    import random
+    
+    # 5초 고정 대기 시간 설정 (테스트 신속성 위해)
+    wait_time = 5 
+
+    task_id = str(uuid.uuid4())
+
+    tasks[task_id] = {
+        "status": "queued",
+        "result": None,
+        "error": None
+    }
+    
+    # 로컬 전용 가짜 작업 함수 호출
+    background_tasks.add_task(process_local_fake_generation, task_id, prompt, wait_time)
+
+    return {
+        "task_id": task_id,
+        "status": "queued",
+        "message": f"로컬 테스트 작업이 시작되었습니다. {wait_time}초 후 완료됩니다."
     }
     
 
