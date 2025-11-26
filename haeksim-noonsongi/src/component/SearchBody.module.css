@@ -1,16 +1,11 @@
-.questionContainer {
-  display: flex;
-  justify-content: end;
-}
-.question {
-  max-width: 50%;
-  padding: 0 1rem;
+.videoContainer {
+  width: 100%;
   height: fit-content;
-  line-height: 1.5rem;
-  background-color: var(--grey);
-  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0px;
 }
-.question p {
-  white-space: pre-wrap;
-  word-wrap: break-word;
+.video {
+  width: 95%;
 }
