@@ -69,6 +69,70 @@ async def test_websocket_connection():
         return {"status": "failed", "message": f"Connection Error: {str(e)}"}
 
 
+@app.get("/api/test_cloud_urls")
+async def test_cloud_urls():
+    """
+    CLOUD_URL_1~4 각각의 WebSocket 연결을 테스트하고 결과 반환
+    """
+    CLOUD_URLS = [
+        os.getenv("CLOUD_URL_1"),
+        os.getenv("CLOUD_URL_2"),
+        os.getenv("CLOUD_URL_3"),
+        os.getenv("CLOUD_URL_4")
+    ]
+
+    results = {}
+
+    for i, cloud_url in enumerate(CLOUD_URLS, start=1):
+        name = f"CLOUD_URL_{i}"
+
+        if not cloud_url:
+            results[name] = {
+                "status": "failed",
+                "message": f"{name} environment variable is missing."
+            }
+            continue
+
+        # ws 또는 wss 변환
+        if cloud_url.startswith("https"):
+            ws_base = cloud_url.replace("https://", "wss://")
+        else:
+            ws_base = cloud_url.replace("http://", "ws://")
+
+        client_id = str(uuid.uuid4())
+        ws_url = f"{ws_base.rstrip('/')}/ws?clientId={client_id}"
+
+        print(f"[TEST] Connecting to {name}: {ws_url}")
+
+        try:
+            ws = websocket.create_connection(
+                ws_url,
+                timeout=5,
+                sslopt={"cert_reqs": ssl.CERT_NONE}
+            )
+
+            if ws.connected:
+                ws.close()
+                results[name] = {
+                    "status": "ok",
+                    "message": f"WebSocket Connected Successfully to {ws_url}"
+                }
+            else:
+                results[name] = {
+                    "status": "failed",
+                    "message": "WebSocket created but not connected."
+                }
+
+        except Exception as e:
+            print(f"[TEST] WebSocket Error ({name}): {e}")
+            results[name] = {
+                "status": "failed",
+                "message": f"Connection Error: {str(e)}"
+            }
+
+    return results
+
+
 async def process_generation(task_id: str, prompt: str, file_path: str):
     CLOUD_URL = os.getenv("CLOUD_URL")
     

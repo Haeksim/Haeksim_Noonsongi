@@ -56,7 +56,7 @@ def merge_video_tool(dummy: str = "start") -> str:
             f.write(f"file '{os.path.abspath(v)}'\n")
 
     merged_video_path = os.path.join(OUTPUT_DIR, "merged_temp.mp4")
-    final_output_path = os.path.join("output.mp4")
+    final_output_path = os.path.join(OUTPUT_DIR, "output.mp4")
 
     # 1) concat videos
     concat_cmd = [

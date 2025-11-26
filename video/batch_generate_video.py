@@ -13,6 +13,14 @@ GENERATED_VIDEO_DIR = "files/generated_videos"
 POLLING_TIMEOUT = 600  # 최대 대기 시간 (초) - 10분
 POLLING_INTERVAL = 5   # 확인 간격 (초)
 
+CLOUD_URLS = [
+    os.getenv("CLOUD_URL_1"),
+    os.getenv("CLOUD_URL_2"),
+    os.getenv("CLOUD_URL_3"),
+    os.getenv("CLOUD_URL_4"),
+]
+
+
 def _clear_generated_video_dir():
     """files/generated_video 폴더를 완전히 비우는 함수"""
     if os.path.exists(GENERATED_VIDEO_DIR):
@@ -20,17 +28,17 @@ def _clear_generated_video_dir():
     os.makedirs(GENERATED_VIDEO_DIR, exist_ok=True)
 
 
-def call_generate_video(index: int):
+def call_generate_video(index: int, cloud_url: str):
     """generate_video_tool 내부 실제 동기함수 호출"""
     func = getattr(gen_tool, "func", None)
     if callable(func):
-        return func(index)
+        return func(index=index, cloud_url=cloud_url)
 
     if callable(getattr(gen_tool, "run", None)):
-        return gen_tool.run(index)
+        return gen_tool.run(index=index, cloud_url=cloud_url)
 
     if callable(getattr(gen_tool, "invoke", None)):
-        return gen_tool.invoke(index)
+        return gen_tool.invoke(index=index, cloud_url=cloud_url)
 
     raise RuntimeError("generate_video_tool을 호출할 수 없습니다.")
 
@@ -90,15 +98,20 @@ def batch_generate_video_tool(indexes: List[int]) -> None:
         
         # 1. 4개 작업 병렬 요청 (Request)
         with ThreadPoolExecutor(max_workers=CONCURRENCY_LIMIT) as exe:
-            futures = [exe.submit(call_generate_video, idx) for idx in batch]
+            futures = []
+
+            for idx in batch:
+                # index 기반 URL 매핑
+                cloud_url = CLOUD_URLS[(idx - 1) % len(CLOUD_URLS)]
+                futures.append(exe.submit(call_generate_video, idx, cloud_url))
+
             for fut in as_completed(futures):
                 try:
-                    _ = fut.result() # 요청 자체의 성공 여부 확인
+                    _ = fut.result()
                 except Exception as e:
                     print(f"[Error] 인덱스 요청 중 에러 발생: {e}")
 
         # 2. 이번 배치의 파일들이 생성될 때까지 대기 (Polling)
-        # 예: 첫 번째 배치면 4개, 두 번째 배치면 8개가 될 때까지 기다림
         accumulated_target_count += len(batch)
         _wait_for_files(accumulated_target_count)
 
