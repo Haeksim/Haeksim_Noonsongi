@@ -18,7 +18,7 @@ app = FastAPI()
 OUTPUT_FILES_DIR = "output_files"
 DOMAIN_URL="https://haeksimnoonsongi-production-9a31.up.railway.app/"
 os.makedirs(OUTPUT_FILES_DIR, exist_ok=True) 
-app.mount("/static", StaticFiles(directory=OUTPUT_FILES_DIR), name="static_files") 
+
 
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
@@ -400,3 +400,5 @@ async def check_status(task_id: str):
     
     # 현재 상태(processing, completed 등)와 결과를 반환
     return tasks[task_id]
+
+app.mount("/static", StaticFiles(directory=OUTPUT_FILES_DIR), name="static_files") 
