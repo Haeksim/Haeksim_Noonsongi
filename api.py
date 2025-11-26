@@ -7,6 +7,8 @@ import os
 import shutil
 import uuid
 import asyncio
+import websocket
+import ssl  
 
 app = FastAPI()
 
@@ -26,6 +28,43 @@ class ChatRequest(BaseModel):
 @app.get("/api/test")
 async def test_api():
     return {"status": "ok", "message": "API server is running normally!"}
+
+@app.get("/api/test2")
+async def test_websocket_connection():
+    """
+    CLOUD_URL 환경변수를 사용하여 ComfyUI WebSocket 연결을 테스트합니다.
+    연결에 성공하면 status: ok를 반환합니다.
+    """
+    cloud_url = os.getenv("CLOUD_URL")
+    
+    if not cloud_url:
+        return {"status": "failed", "message": "CLOUD_URL environment variable is missing."}
+
+    # 1. http -> ws, https -> wss 변환
+    if cloud_url.startswith("https"):
+        ws_base = cloud_url.replace("https://", "wss://")
+    else:
+        ws_base = cloud_url.replace("http://", "ws://")
+    
+    # 2. WebSocket URL 구성
+    client_id = str(uuid.uuid4())
+    ws_url = f"{ws_base.rstrip('/')}/ws?clientId={client_id}"
+    
+    print(f"[TEST] Connecting to WebSocket: {ws_url}")
+    
+    try:
+        # 3. 연결 시도 (Timeout 5초)
+        ws = websocket.create_connection(ws_url, timeout=5, sslopt={"cert_reqs": ssl.CERT_NONE})
+        
+        if ws.connected:
+            ws.close()
+            return {"status": "ok", "message": f"WebSocket Connected Successfully to {ws_url}"}
+        else:
+             return {"status": "failed", "message": "WebSocket created but connection failed."}
+
+    except Exception as e:
+        print(f"[TEST] WebSocket Error: {e}")
+        return {"status": "failed", "message": f"Connection Error: {str(e)}"}
 
 
 async def process_generation(task_id: str, prompt: str, file_path: str):
