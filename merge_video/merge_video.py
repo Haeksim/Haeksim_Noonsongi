@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import subprocess
 from langchain_core.tools import tool
 
@@ -51,6 +52,9 @@ def merge_video_tool(dummy: str = "start") -> str:
     song.srt 자막 + song.mp3 배경음악을 적용해 최종 mp4 생성.
     """
 
+    if os.path.exists(OUTPUT_DIR):
+        print(f"[*] 기존 {OUTPUT_DIR} 폴더 삭제 및 초기화...")
+        shutil.rmtree(OUTPUT_DIR)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     try:
