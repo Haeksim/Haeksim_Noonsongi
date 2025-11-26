@@ -9,8 +9,10 @@ import uuid
 import asyncio
 import websocket
 import ssl  
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+app.mount("/", StaticFiles(directory="files"), name="static_root_files") 
 
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
