@@ -16,6 +16,7 @@ load_dotenv()
 
 app = FastAPI()
 OUTPUT_FILES_DIR = "output_files"
+DOMAIN_URL="https://haeksimnoonsongi-production-9a31.up.railway.app/"
 os.makedirs(OUTPUT_FILES_DIR, exist_ok=True) 
 app.mount("/static", StaticFiles(directory=OUTPUT_FILES_DIR), name="static_files") 
 
@@ -139,7 +140,6 @@ async def test_cloud_urls():
 
 
 async def process_generation(task_id: str, prompt: str, file_path: str):
-    CLOUD_URL = os.getenv("CLOUD_URL")
     
     try:
         # 상태 업데이트: 처리 중
@@ -198,7 +198,7 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         processed_path = final_path.strip()
         final_url = processed_path
         
-        if CLOUD_URL and not processed_path.startswith("http"):
+        if DOMAIN_URL and not processed_path.startswith("http"):
             
             # 1. 파일 이름만 추출
             file_name = os.path.basename(processed_path)
@@ -211,7 +211,7 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
                 print(f"✅ 결과 파일 output_files로 복사 (덮어쓰기) 완료: {destination_path}")
             
             # 3. URL 생성: https://도메인/static/파일명
-            base_url = CLOUD_URL.rstrip('/')
+            base_url = DOMAIN_URL.rstrip('/')
             final_url = f"{base_url}/static/{file_name.replace(os.path.sep, '/')}"
             
         # 작업 완료 처리
@@ -228,8 +228,6 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
 
 
 async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
-    CLOUD_URL = os.getenv("CLOUD_URL")
-    
     try:
         tasks[task_id]["status"] = "processing"
         print(f"🔄 [Fake Task {task_id}] 가짜 작업 시작. {wait_time}초 대기...")
@@ -239,7 +237,7 @@ async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
         processed_path = "result.mp4" 
         
         # URL 생성
-        base_url = CLOUD_URL.rstrip('/')
+        base_url = DOMAIN_URL.rstrip('/')
         
         # 파일 이름만 URL에 붙여서 /static/파일명 형태로 생성
         final_url = f"{base_url}/static/{processed_path.replace(os.path.sep, '/')}" 
@@ -268,13 +266,6 @@ async def process_local_fake_generation(task_id: str, prompt: str, wait_time: in
         await asyncio.sleep(wait_time)
         
         processed_path = "result.mp4" 
-        
-        # 가짜 파일을 output_files 폴더에 생성 (노출용)
-        dummy_file_path = os.path.join(OUTPUT_FILES_DIR, processed_path)
-        # 빈 더미 파일 생성 (없으면 404가 뜨므로 반드시 필요)
-        with open(dummy_file_path, "w") as f:
-            f.write("DUMMY VIDEO FILE FOR LOCAL TEST")
-        print(f"✅ 더미 파일 생성: {dummy_file_path}")
         
         # URL 생성: 로컬 주소와 /static/파일명 형태로 생성
         final_url = f"{LOCAL_URL}/static/{processed_path.replace(os.path.sep, '/')}" 
