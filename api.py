@@ -7,7 +7,7 @@ import os
 import shutil
 import uuid
 import asyncio
-from websocket import create_connection
+import websocket
 import ssl  
 
 app = FastAPI()
