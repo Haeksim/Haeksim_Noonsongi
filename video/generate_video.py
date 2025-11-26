@@ -205,13 +205,15 @@ def load_prompt_by_index(index: int):
 
 
 @tool
-def generate_video_tool(index: int) -> list:
+def generate_video_tool(index: int, cloud_url: str = None) -> list:
     """
     Generates a video using a ComfyUI workflow,
     automatically selecting a rotating variation image.
     """
 
-    CLOUD_URL=os.getenv("CLOUD_URL")
+    if cloud_url is None:
+        raise Exception("cloud_url parameter not provided")
+
     COMFY_API_KEY= os.getenv("COMFY_API_KEY")
     
     item = load_prompt_by_index(index)
@@ -219,6 +221,7 @@ def generate_video_tool(index: int) -> list:
     time = item["time"]
 
     print(f"[*] Using prompt index={index}")
+    print(f"    Cloud URL: {cloud_url}")
     print(f"    Time: {time}")
     print(f"    Prompt: {prompt[:50]}...")
     
@@ -236,7 +239,7 @@ def generate_video_tool(index: int) -> list:
     with open(tmp_workflow_path, "w") as f:
         json.dump(workflow, f, indent=4)
 
-    client = ComfyCloudClient(CLOUD_URL, auth_token=None, comfy_api_key=COMFY_API_KEY)
+    client = ComfyCloudClient(cloud_url, auth_token=None, comfy_api_key=COMFY_API_KEY)
     
     try:
         return client.execute_workflow(tmp_workflow_path)
