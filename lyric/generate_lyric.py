@@ -117,7 +117,7 @@ def generate_lyrics_tool(topic_or_filepath: str, style: str="kpop") -> str:
                  "**다른 파트([Verse 2], [Chorus], [Bridge] 등)는 절대 포함하지 마세요.**\n\n"
                  "--- 형식 규칙 (필수 준수 사항) ---\n"
                  "1. **문장 길이 제한:** 각 문장의 길이는 **최대 25자**를 넘을 수 없습니다.\n"
-                 "2. **파트당 라인 수 제한:** [Verse 1]은 **최대 8줄**, [Outro]는 **최대 4줄**로 구성합니다.\n" # 라인 수 제한 추가
+                 "2. **파트당 라인 수 제한:** [Verse 1]은 **최대 4줄**, [Outro]는 **최대 4줄**로 구성합니다.\n" # 라인 수 제한 추가
                  "3. **시작 형식:** 결과물은 **노래 제목이나 다른 텍스트 없이 바로 [Verse 1]으로 시작**해야 합니다.\n"
                  "4. **스타일:** {style} 스타일로 작성해주세요.\n"
                  "-------------------------------\n\n"
@@ -221,7 +221,7 @@ def main_test():
         return
         
     # 2. generate_lyrics_tool 호출
-    topic_style = "힙합 (Hip-Hop)"
+    topic_style = "k-pop"
     
     print(f"\n🔍 툴 호출: generate_lyrics_tool(주제: PDF 파일, 스타일: {topic_style})")
     
