@@ -53,7 +53,7 @@ def generate_song_via_api(lyrics: str, prompt: str = "kpop, 30 seconds, no inter
 
     # --- [재시도 로직 설정] ---
     MAX_RETRIES = 5
-    TARGET_DURATION = 80.0 
+    TARGET_DURATION = 70.0 
 
     for attempt in range(1, MAX_RETRIES + 1):
         print(f"\n🎵 [시도 {attempt}/{MAX_RETRIES}] 노래 생성 시작...")
