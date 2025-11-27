@@ -121,7 +121,8 @@ export default function Input() {
         <img src={add} className={styles.attAddBtn} onClick={handleFileInput} />
       </div>
       <p className={styles.warning}>
-        Haeksim은 실수를 할 수 있습니다. 중요한 정보는 재차 확인하세요.
+        입력된 데이터는 AI 학습 목적으로 활용되지 않습니다. 개인정보 보호 원칙을
+        철저히 준수합니다.
       </p>
     </div>
   );
