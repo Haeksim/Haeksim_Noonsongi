@@ -16,9 +16,17 @@ load_dotenv()
 
 TOTAL_SEGMENTS = 8
 THEME_STYLE = (
-    "Cinematic lighting, high fidelity, fluid motion, "
-    "consistent character details, masterpiece, 8k resolution, "
-    "unreal engine 5 render style, slight volumetric fog"
+    "Futuristic sleek aesthetic, bright soft studio lighting, "
+    "high fidelity, fluid motion, holographic UI elements, "
+    "masterpiece, 8k resolution, unreal engine 5 render style, "
+    "clean modern composition, octane render"
+)
+
+GLOBAL_BACKGROUND = (
+    "A modern futuristic workspace filled with floating holographic data screens. "
+    "Soft glowing digital snowflake particles drifting in the air. "
+    "A blend of reality and abstract cyberspace, representing AI and connectivity. "
+    "Bright, hopeful, and inspiring atmosphere with a blue and white color palette."
 )
 
 llm = ChatGoogleGenerativeAI(
@@ -121,19 +129,28 @@ def generate_video_prompt_tool(srt_file_path: str) -> list:
             lyrics = "(Instrumental/Transition)"
 
         gemini_prompt = f"""
-            You are an expert AI Video Prompt Engineer specialized in Image-to-Video (I2V) generation.
-            I have a STARTING IMAGE of a character. I need a 'Positive Prompt' to animate this character.
+            You are an expert AI Video Prompt Engineer specialized in Image-to-Video generation.
+            I have a REFERENCE IMAGE of a character. I need a prompt to animate this character within a specific consistent world.
 
-            **Rules:**
-            1. DO NOT describe physical appearance (hair, clothes, face).
-            2. Focus ONLY on movement, camera angles, atmosphere.
-            3. Interpret lyrics metaphorically into expressive actions.
-            4. Style: {THEME_STYLE}
-            5. Segment duration: {segment_time} seconds.
+            **GLOBAL CONTEXT (Must appear in every shot):**
+            "{GLOBAL_BACKGROUND}"
 
-            **Lyrics for this segment:** "{lyrics}"
+            **Input Data:**
+            - Current Lyrics: "{lyrics}"
+            - Duration: {segment_time} seconds
 
-            Output a single, comma-separated I2V prompt.
+            **Instructions:**
+            1. **Background Consistency:** ALWAYS maintain the "Global Context" (Futuristic workspace, digital snowflakes, holograms).
+            2. **Lyrical Interpretation:**
+               - "Study/Core points" -> Character analyzing glowing data or touching holographic screens.
+               - "Short-form/Growth" -> Dynamic camera movement, upward motion, brightening lights.
+               - "Connect/Agent" -> Network lines connecting, nodes glowing, abstract data streams.
+               - "Dreams" -> Character looking at a bright horizon of digital light.
+            3. **Character Action:** Character looks intelligent, engaged, and confident. Gestures interacting with invisible tech interfaces.
+            4. **Style:** Append the following style tags at the end: {THEME_STYLE}
+
+            **Output Format:**
+            Provide ONLY the final prompt string.
         """
 
         print(f"[Segment {i+1}/{TOTAL_SEGMENTS}] LLM 프롬프트 생성 중...")
