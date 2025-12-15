@@ -228,33 +228,16 @@ async def process_generation(task_id: str, prompt: str, file_path: str):
         tasks[task_id]["status"] = "failed"
         tasks[task_id]["error"] = str(e)
 
+OUTPUT_FILE_PATH = "output_files/result.mp4"
 
-async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
-    try:
-        tasks[task_id]["status"] = "processing"
-        print(f"🔄 [Fake Task {task_id}] 가짜 작업 시작. {wait_time}초 대기...")
+def process_fake_generation(wait_time: int):
+    time.sleep(wait_time)
 
-        await asyncio.sleep(wait_time)
-        
-        processed_path = "output_files/result.mp4" 
-        
-        # URL 생성
-        base_url = DOMAIN_URL.rstrip('/')
-        
-        # 파일 이름만 URL에 붙여서 /static/파일명 형태로 생성
-        final_url = f"{base_url}/static/{processed_path.replace(os.path.sep, '/')}" 
+    os.makedirs("output_files", exist_ok=True)
 
-
-        tasks[task_id]["status"] = "completed"
-        tasks[task_id]["result"] = final_url
-        tasks[task_id]["message"] = f"Fake completed after {wait_time} seconds with prompt: {prompt}"
-        print(f"✅ [Fake Task {task_id}] 가짜 작업 완료: {final_url}")
-
-    except Exception as e:
-        print(f"❌ [Fake Task {task_id}] 에러 발생: {e}")
-        tasks[task_id]["status"] = "failed"
-        tasks[task_id]["error"] = str(e)
-
+    # 가짜 mp4 생성 (또는 기존 파일 overwrite)
+    with open(OUTPUT_FILE_PATH, "wb") as f:
+        f.write(b"fake mp4 content")
 
 # --- [추가] 로컬 환경 테스트용 가짜 작업 처리 함수 ---
 async def process_local_fake_generation(task_id: str, prompt: str, wait_time: int):
@@ -331,34 +314,20 @@ async def generate_response(
 async def generate_fake_response_async(
     background_tasks: BackgroundTasks,
     prompt: str = Form(...),
-    file: UploadFile = File(None) 
+    file: UploadFile = File(None)
 ):
-    """
-    프론트엔드 테스트용 비동기 API. 입력 프롬프트와 파일명을 받고, 
-    5초~15초 사이를 랜덤으로 대기한 후 가짜 output.mp4 URL을 반환합니다.
-    """
-    import random
-    
-    # 5초에서 15초 사이 랜덤 대기 시간 설정
-    wait_time = random.randint(5, 15) 
+    wait_time = 15  # 고정 15초 (원하면 random)
 
-    task_id = str(uuid.uuid4())
+    # 기존 파일 제거 → 바로 접근 못 하게
+    if os.path.exists(OUTPUT_FILE_PATH):
+        os.remove(OUTPUT_FILE_PATH)
 
-    tasks[task_id] = {
-        "status": "queued",
-        "result": None,
-        "error": None
-    }
-
-    # 파일이 넘어왔다면, 파일 저장 및 절대 경로 생성 로직이 필요합니다.
-    # 여기서는 가짜 테스트를 위해 파일을 저장하지 않고 바로 가짜 작업으로 넘깁니다.
-    
-    background_tasks.add_task(process_fake_generation, task_id, prompt, wait_time)
+    background_tasks.add_task(process_fake_generation, wait_time)
 
     return {
-        "task_id": task_id,
         "status": "queued",
-        "message": f"가짜 작업이 시작되었습니다. {wait_time}초 후 완료됩니다."
+        "video_url": "/static/result.mp4",
+        "message": "15초 후 영상이 생성됩니다."
     }
 
 # --- [추가] 로컬 테스트용 가짜 API ---
@@ -373,8 +342,8 @@ async def generate_fake2_async(
     """
     import random
     
-    # 5초 고정 대기 시간 설정 (테스트 신속성 위해)
-    wait_time = 5 
+    # 15초 고정 대기 시간 설정 (테스트 신속성 위해)
+    wait_time = 15 
 
     task_id = str(uuid.uuid4())
 
