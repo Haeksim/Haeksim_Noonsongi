@@ -1,24 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Chat from "./Chat";
+import Loading from "./Loading";
 
 import PayloadContext from "../context/PayloadContext";
 import styles from "./SearchBody.module.css";
 
 export default function SearchBody() {
-  const { prompt, setPrompt, payload, setPayload, result, setResult } =
-    useContext(PayloadContext);
+  const { payload, setPayload, result, setResult } = useContext(PayloadContext);
+  useEffect(() => {
+    console.log(result);
+  }, [result]);
   return (
     <div>
       <Chat owner={"user"}>
         <p>{`${payload.file.name} \n ${payload.prompt}`}</p>
       </Chat>
-      {result && (
-        <Chat owner={"ai"}>
-          <div className={styles.videoContainer}>
+      <Chat owner={"ai"}>
+        <div className={styles.videoContainer}>
+          {result ? (
             <video src={result} controls className={styles.video} />
-          </div>
-        </Chat>
-      )}
+          ) : (
+            <Loading />
+          )}
+        </div>
+      </Chat>
     </div>
   );
 }

@@ -1,0 +1,18 @@
+.img {
+  animation: load 1.6s infinite linear;
+  width: 15px;
+  height: 15px;
+  padding: 15px;
+}
+
+@keyframes load {
+  0% {
+    transform: rotate(0deg);
+  }
+  60% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
