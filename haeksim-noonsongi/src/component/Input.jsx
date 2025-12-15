@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import PayloadContext from "../context/PayloadContext";
 import { postSearch, getSearchResult } from "../api/search";
 
@@ -7,9 +8,42 @@ import add from "../icon/add.png";
 
 export default function Input() {
   const [input, setInput] = useState("");
-  const { prompt, setPrompt, payload, setPayload, result, setResult } =
-    useContext(PayloadContext);
+  const { payload, setPayload, result, setResult } = useContext(PayloadContext);
   const textareaRef = useRef(null);
+
+  //API 관련 코드
+  const startSearchMutation = useMutation({
+    mutationFn: postSearch,
+  });
+  const {
+    data: searchData,
+    isLoading: isPolling,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["searchResult", startSearchMutation.data],
+    queryFn: () => getSearchResult(startSearchMutation.data),
+    enabled: !!startSearchMutation.data,
+    refetchInterval: (query) => {
+      const status = query.state.data?.data?.status;
+
+      if (status === "completed" || status === "failed") {
+        return false; // stop polling
+      }
+      return 4000; // poll every 4 seconds
+    },
+  });
+  useEffect(() => {
+    const status = searchData?.data?.status;
+
+    if (status === "completed") {
+      setResult(searchData.data.result);
+    }
+
+    if (status === "failed") {
+      alert(searchData.data.error);
+    }
+  }, [searchData]);
 
   //인풋 상자 크기 조정 로직
   const handleInputBox = () => {
@@ -38,7 +72,6 @@ export default function Input() {
     fileInput.addEventListener("change", (event) => {
       const file = event.target.files[0];
       if (file) {
-        setPrompt(file.name);
         setPayload((prev) => ({ ...prev, file: file }));
       }
     });
@@ -46,57 +79,21 @@ export default function Input() {
   };
 
   const handleEnter = async (e) => {
-    try {
-      const nextPayload = {
-        ...payload,
-        prompt: e.target.value,
-      };
+    const nextPayload = {
+      ...payload,
+      prompt: input,
+    };
 
-      setPrompt(input);
-      setPayload(nextPayload);
-      setInput("");
+    setPayload(nextPayload);
+    setInput("");
 
-      const taskId = await postSearch(nextPayload);
-      console.log(taskId);
-
-      if (taskId) {
-        const result = await pollStatus(taskId);
-        console.log(result);
-        setResult(result);
-      }
-    } catch (e) {
-      alert(e);
-    }
+    startSearchMutation.mutate(nextPayload);
   };
-
-  //폴링 기다리기
-  function pollStatus(taskId) {
-    return new Promise((resolve, reject) => {
-      const interval = setInterval(async () => {
-        try {
-          const res = await getSearchResult(taskId);
-          const status = res.data.status;
-
-          if (status === "completed") {
-            clearInterval(interval);
-            resolve(res.data.result); // return the result properly
-          } else if (status === "failed") {
-            clearInterval(interval);
-            reject(res.data.error); // reject if failed
-          } else {
-            console.log("생성 중... (현재 상태: " + status + ")");
-          }
-        } catch (err) {
-          clearInterval(interval);
-          reject(err);
-        }
-      }, 4000);
-    });
-  }
 
   useEffect(() => {
     handleInputBox();
   }, [input]);
+
   return (
     <div className={styles.inputContainer}>
       <div className={styles.attachmentTab}>

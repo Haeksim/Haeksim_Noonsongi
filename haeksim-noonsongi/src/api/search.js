@@ -1,9 +1,6 @@
 import { defaultAxios } from "../axios";
 
 export const postSearch = async (payload) => {
-  console.log("post");
-  console.log(payload);
-
   if (!payload.prompt || !payload.file) return;
 
   const formData = new FormData();
@@ -18,7 +15,6 @@ export const postSearch = async (payload) => {
 };
 
 export const getSearchResult = async (taskId) => {
-  console.log("get");
   const response = await defaultAxios.get(`/api/status/${taskId}`);
   return response;
 };
