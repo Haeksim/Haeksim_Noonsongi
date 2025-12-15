@@ -20,6 +20,7 @@ OUTPUT_FILES_DIR = "output_files"
 DOMAIN_URL="https://haeksimnoonsongi-production-9a31.up.railway.app/"
 os.makedirs(OUTPUT_FILES_DIR, exist_ok=True) 
 
+app.mount("/static", StaticFiles(directory=OUTPUT_FILES_DIR), name="static")
 
 # 1. CORS 설정 (프론트엔드와 통신하기 위해 필수)
 app.add_middleware(
