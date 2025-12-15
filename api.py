@@ -327,7 +327,7 @@ async def generate_fake_response_async(
 
     return {
         "status": "queued",
-        "video_url": "/static/result.mp4",
+        "video_url": f"{DOMAIN_URL}/static/result.mp4",
         "message": "15초 후 영상이 생성됩니다."
     }
 
