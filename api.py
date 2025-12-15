@@ -236,7 +236,7 @@ async def process_fake_generation(task_id: str, prompt: str, wait_time: int):
 
         await asyncio.sleep(wait_time)
         
-        processed_path = "result.mp4" 
+        processed_path = "output_files/result.mp4" 
         
         # URL 생성
         base_url = DOMAIN_URL.rstrip('/')
