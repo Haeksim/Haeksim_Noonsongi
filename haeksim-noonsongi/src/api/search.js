@@ -7,7 +7,7 @@ export const postSearch = async (payload) => {
   formData.append("prompt", payload.prompt);
   formData.append("file", payload.file);
 
-  const response = await defaultAxios.post("/api/generate", formData, {
+  const response = await defaultAxios.post("/api/generate_fake", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
