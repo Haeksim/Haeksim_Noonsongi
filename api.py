@@ -342,7 +342,7 @@ async def generate_fake_response_async(
     import random
 
     # 5초에서 15초 사이 랜덤 대기 시간 설정
-    wait_time = random.randint(5, 15) 
+    wait_time = 60 
 
     task_id = str(uuid.uuid4())
 
