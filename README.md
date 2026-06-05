@@ -1,16 +1,6 @@
-<<<<<<< Updated upstream
-<p align="center">
-  <img 
-    src="https://github.com/user-attachments/assets/4970d156-d1dc-4654-99b8-dc091e5d7854" 
-    width="491" 
-    height="668" 
-    alt="image"
-  />
-</p>
-=======
-# 눈송이 AI - 숏폼 생성 플랫폼
+# 눈송이 AI — 나만의 공부 비서
 
-> **수업 필기나 PDF를 넣으면 핵심만 쏙 정리하여, 관련 영상과 노래까지 들어간 숏폼을 만들어준다!**
+> **수업 필기나 PDF를 넣으면 핵심만 쏙 정리하여, 관련 영상과 노래까지 만들어준다!**
 
 숙명여자대학교 2025 SMU EDU EXPO 출품작 (동상) <br>
 팀명: **와 너 정말 \*핵심\*을 찔렀어** | 김진영 · 정민주 · 최은소 | 지도교수: 이기용
@@ -49,6 +39,8 @@
 [YouTube에서 데모 영상 보기](https://youtu.be/lr8gY9DNCsA)
 
 <video src="presentation/demo_video.mp4" controls width="100%"></video>
+
+> 영상이 재생되지 않으면 [여기서 직접 다운로드](presentation/demo_video.mp4)해주세요.
 
 ---
 
@@ -131,4 +123,3 @@ Haeksim_Noonsongi/
 | 김진영 | 데이터 엔지니어 — LangChain 에이전트 설계, AI 파이프라인 구축 |
 | 정민주 | 프론트엔드 개발자 — React UI, API 연동 |
 | 최은소 | DevOps — Docker 컨테이너화, 배포 파이프라인 구축, LangChain 에이전트 설계 |
->>>>>>> Stashed changes
