@@ -36,7 +36,7 @@
 
 ## 데모 영상
 
-<video src="[presentation/demo_video.mp4](https://youtu.be/lr8gY9DNCsA)" controls width="100%"></video>
+[![Demo Video](https://img.youtube.com/vi/lr8gY9DNCsA/maxresdefault.jpg)](https://youtu.be/lr8gY9DNCsA)
 
 > 영상이 재생되지 않으면 [YouTube에서 데모 영상](https://youtu.be/lr8gY9DNCsA)을 확인해주세요.
 
